@@ -1,0 +1,12 @@
+# Ignore Python cache files
+__pycache__/
+
+# Ignore specific folders
+archive/
+deck/
+deck1/
+deck2/
+fronts/
+
+# Ignore specific text document
+balance_patchnote.txt
