@@ -48,3 +48,23 @@ class Card(pygame.sprite.Sprite):
     def set_to_place(self, place):
         self.rect.x = 10 + (CARD_WIDTH + SEPARATOR_HORIZONTAL)*place - 10*(CARD_WIDTH + SEPARATOR_HORIZONTAL)*(place//10)
         self.rect.y = 105 + (CARD_HEIGHT + SEPARATOR_VERTICAL)*(place//10)
+
+    def isVisible(self):
+        if self.rect.y < 105 or self.rect.y > 105 + 2*(CARD_HEIGHT + SEPARATOR_VERTICAL):
+            return False
+        return True
+
+    def isHidden(self):
+        # down and up are there to get along the scroll direction, don't think too much about it (*cries*)
+        if self.rect.y < 105:
+            return "down"
+        elif self.rect.y > 105 + 2*(CARD_HEIGHT + SEPARATOR_VERTICAL):
+            return "up"
+        else:
+            return False
+
+    def scroll(self, direction):
+        if direction == "down":
+            self.rect.y += CARD_HEIGHT + SEPARATOR_VERTICAL
+        elif direction == "up":
+            self.rect.y -= CARD_HEIGHT + SEPARATOR_VERTICAL

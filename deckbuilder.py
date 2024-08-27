@@ -45,7 +45,8 @@ def main():
     for i in range(30):
         trunk_list.add(Card('fronts/'+ cardstr(i) +'.png', number = cardstr(i), deck_place = i))
     for card in trunk_list:
-        card_list.add(card)
+        if card.isVisible():
+            card_list.add(card)
 
     clock = pygame.time.Clock()
 
@@ -70,7 +71,8 @@ def main():
                         # add trunk cards to the displayed list of cards
                         card_list.empty()
                         for card in trunk_list:
-                            card_list.add(card)
+                            if card.isVisible():
+                                card_list.add(card)
                     # if we click on the deck
                     elif zone_deck.rect.collidepoint(pygame.mouse.get_pos()):
                         selected_zone = "deck"
@@ -81,7 +83,8 @@ def main():
                         # add deck cards to the displayed list of cards
                         card_list.empty()
                         for card in deck_list:
-                            card_list.add(card)
+                            if card.isVisible():
+                                card_list.add(card)
                     # if we click on the save button
                     elif save_zone.rect.collidepoint(pygame.mouse.get_pos()):
                         i = 0
@@ -89,37 +92,74 @@ def main():
                             shutil.copy(card.image_path, 'deck/' + cardstr(i) + '.png')
                             i += 1
 
+                    # if a card is clicked
+                    for card in card_list:
+                        if card.isClicked(event):
+                            # while being in the trunk
+                            if selected_zone == "trunk":
+                                # we add a copy of the card in the deck
+                                deck_list.add(Card(card.image_path, deck_place = deck_cursor))
+                                deck_cursor += 1
+                            # while being in the deck
+                            elif selected_zone == "deck" and click_cooldown == 0:
+                                # we remove the card from the deck
+                                deck_list.remove(card)
+                                # replace the cards to fill the spot of the missing card
+                                for other_card in deck_list:
+                                    if card.deck_place < other_card.deck_place:
+                                        other_card.deck_place -= 1
+                                        other_card.set_to_place(other_card.deck_place)
+                                # preventing multiple events to trigger
+                                click_cooldown = 4
+                                # make it so the next card in the deck is added after the last current card
+                                deck_cursor -= 1
+
+                                # update the card in the screen
+                                card_list.empty()
+                                for card in deck_list:
+                                    card_list.add(card)
 
                 # Right mouse button up
                 if event.button == 3:
                     pass
 
-            for card in card_list:
-                # if a card is clicked
-                if card.isClicked(event):
-                    # while being in the trunk
+                # Scroll up or down
+                if event.button == 4 or event.button == 5:
+                    if event.button == 4:
+                        scrollDirection = "up"
+                    else:
+                        scrollDirection = "down"
+                    # checking for at least a card to scroll to
+                    scrollable = False
                     if selected_zone == "trunk":
-                        # we add a copy of the card in the deck
-                        deck_list.add(Card(card.image_path, deck_place = deck_cursor))
-                        deck_cursor += 1
-                    # while being in the deck
-                    elif selected_zone == "deck" and click_cooldown == 0:
-                        # we remove the card from the deck
-                        deck_list.remove(card)
-                        # replace the cards to fill the spot of the missing card
-                        for other_card in deck_list:
-                            if card.deck_place < other_card.deck_place:
-                                other_card.deck_place -= 1
-                                other_card.set_to_place(other_card.deck_place)
-                        # preventing multiple events to trigger
-                        click_cooldown = 4
-                        # make it so the next card in the deck is added after the last current card
-                        deck_cursor -= 1
-
-                        # update the card in the screen
-                        card_list.empty()
+                        for card in trunk_list:
+                            if card.isHidden() == scrollDirection:
+                                scrollable = True
+                                break
+                    elif selected_zone == "deck":
                         for card in deck_list:
-                            card_list.add(card)
+                            if card.isHidden() == scrollDirection:
+                                scrollable = True
+                                break
+                    if scrollable:
+                        # hide the cards that are too low or too high after the scroll
+                        card_list.empty()
+                        if selected_zone == "trunk":
+                            for card in trunk_list:
+                                # scroll
+                                card.scroll(scrollDirection)
+                                # add the card to the displayed cards
+                                if card.isVisible():
+                                    card_list.add(card)
+                        elif selected_zone == "deck":
+                            for card in deck_list:
+                                # scroll
+                                card.scroll(scrollDirection)
+                                # add the card to the displayed cards
+                                if card.isVisible():
+                                    card_list.add(card)
+
+
 
         screen.fill(BACKGROUND)
 
