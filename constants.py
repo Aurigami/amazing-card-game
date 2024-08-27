@@ -26,3 +26,7 @@ DECKBUILDER_TRESHOLD = 10
 # Separator size for the cards in the deckbuilder
 SEPARATOR_HORIZONTAL = 5
 SEPARATOR_VERTICAL = 10
+
+# Amount of cards in your trunk
+# If the first card is 00.png, and the last card is 29.png, then this constant should be 30
+TRUNK_CARD_AMOUNT = 35

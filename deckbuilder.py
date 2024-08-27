@@ -42,7 +42,7 @@ def main():
     zone_list.add(zone_deck)
 
     # adding cards from the trunk at the right position
-    for i in range(30):
+    for i in range(TRUNK_CARD_AMOUNT):
         trunk_list.add(Card('fronts/'+ cardstr(i) +'.png', number = cardstr(i), deck_place = i))
     for card in trunk_list:
         if card.isVisible():
